@@ -1,34 +1,61 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
+import "./App.css"
+import { useDispatch, useSelector } from "react-redux"
+import { addPost, deletePost } from "./features/Posts";
+import { RootState } from "./main"
+import { useState } from "react";
 function App() {
-  const [count, setCount] = useState(0)
+const postList = useSelector((state: RootState) => state.posts.value)
+const dispatch = useDispatch();
+const [name, setName] = useState("");
+const [content, setContent] = useState("");
+
+const handleClick = () => {
+  dispatch(addPost(
+    {
+      id: postList.length+1,
+      name: name,
+      content: content,
+    }
+  ))
+}
 
   return (
-    <>
+    <div className="App">
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h1>React-Redux掲示板</h1>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      <div className="addPost">
+        <input
+          type="text"
+          placeholder="お名前"
+          onChange={(e) => setName(e.target.value)}
+          value={name}
+        />
+        <input
+          type="text"
+          placeholder="投稿内容"
+          onChange={(e) => setContent(e.target.value)}
+          value={content}
+        />
+        <button 
+        onClick={() => handleClick()}
+        >投稿</button>
+        <hr />
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      <div className="displayPosts">
+        {postList.map((post) => (
+          <div key={post.id} className="post">
+            <h1 className="postName">{post.name}</h1>
+            <h1 className="postContent">{post.content}</h1>
+            <button 
+            onClick={() => dispatch(deletePost({ id: post.id }))}
+            >
+              削除
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
